@@ -1,0 +1,42 @@
+form {
+    justify-content: center;
+    border: 1px solid black;
+    width: 45vw;
+    margin-left: 30vw;
+    
+  }
+  
+  div {
+    margin-bottom: 15px;
+  }
+  
+  label {
+    display: block;
+    display: flex;
+    margin-bottom: 5px;
+    font-weight: bold;
+    margin-left: 3vw;
+
+  }
+  
+  input,
+  select,
+  textarea {
+   width: 40vw;
+    padding: 8px;
+    box-sizing: border-box;
+  }
+  
+  button {
+    background-color: #4caf50;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+  }
+  
+  button:hover {
+    background-color: #45a049;
+  }
+  

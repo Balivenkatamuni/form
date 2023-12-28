@@ -56,6 +56,50 @@ app.get('/get-employees', async (req, res) => {
   }
 });
 
+// ... (previous code)
+
+app.put('/update-employee/:employeeId', async (req, res) => {
+    const employeeId = req.params.employeeId;
+    const updatedEmployeeData = req.body;
+  
+    try {
+    
+      const updatedEmployee = await Employee.findOneAndUpdate(
+        { employeeId: employeeId },
+        { $set: updatedEmployeeData },
+        { new: true } 
+      );
+  
+      if (updatedEmployee) {
+        res.status(200).json({ message: 'Employee updated successfully', updatedEmployee });
+      } else {
+        res.status(404).json({ message: 'Employee not found' });
+      }
+    } catch (error) {
+      console.error('Error updating employee:', error);
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  });
+  
+  app.delete('/delete-employee/:employeeId', async (req, res) => {
+    const employeeId = req.params.employeeId;
+  
+    try {
+     
+      const deletedEmployee = await Employee.findOneAndDelete({ employeeId: employeeId });
+  
+      if (deletedEmployee) {
+        res.status(200).json({ message: 'Employee deleted successfully', deletedEmployee });
+      } else {
+        res.status(404).json({ message: 'Employee not found' });
+      }
+    } catch (error) {
+      console.error('Error deleting employee:', error);
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  });
+  
+  
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
   });

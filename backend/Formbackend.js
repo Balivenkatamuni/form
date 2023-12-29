@@ -56,7 +56,7 @@ app.get('/get-employees', async (req, res) => {
   }
 });
 
-// ... (previous code)
+
 
 app.put('/update-employee/:employeeId', async (req, res) => {
     const employeeId = req.params.employeeId;

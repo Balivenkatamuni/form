@@ -1,19 +1,19 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import './Empform.css'
+import './Student.css'
 import { Link } from 'react-router-dom';
 
 
 
-const Form = () => {
+const StudentForm = () => {
    
   const [formData, setFormData] = useState({
     name: '',
-    employeeId: '',
+    studentId: '',
     email: '',
     gender: '',
     address: '',
-    designation: ''
+    course: ''
   });
 
   const handleChange = (e) => {
@@ -29,18 +29,18 @@ const Form = () => {
 
     try {
       // Use axios to make a POST request to the server
-      const response = await axios.post('http://localhost:3000/submit-form', formData);
+      const response = await axios.post('http://localhost:3000/student-form', formData);
 
       console.log(response.data);
 
       // Optionally, you can reset the form after successful submission
       setFormData({
         name: '',
-        employeeId: '',
+        studentId: '',
         email: '',
         gender: '',
         address: '',
-        designation: ''
+        course: ''
       });
 
     } catch (error) {
@@ -50,14 +50,14 @@ const Form = () => {
 
   return (
     <form onSubmit={handleSubmit}>
-      <h1>EmployeeForm</h1>
+      <h1>StudentForm</h1>
       <div>
         <label>Name:</label>
         <input type="text" name="name" value={formData.name} onChange={handleChange} required />
       </div>
       <div>
-        <label>Employee ID:</label>
-        <input type="text" name="employeeId" value={formData.employeeId} onChange={handleChange} required />
+        <label>Student ID:</label>
+        <input type="text" name="studentId" value={formData.studentId} onChange={handleChange} required />
       </div>
       <div>
         <label>Email:</label>
@@ -73,14 +73,14 @@ const Form = () => {
         <textarea name="address" value={formData.address} onChange={handleChange} required/>
       </div>
       <div>
-        <label>Designation:</label>
-        <input type="text" name="designation" value={formData.designation} onChange={handleChange} required/>
+        <label>Course:</label>
+        <input type="text" name="course" value={formData.course} onChange={handleChange} required/>
       </div>
       <div>
         <button type="submit">Submit</button>
       </div>
       <div>
-       <Link to="./Empformget" className='link'> 
+       <Link to="./Studentdata" className='link'> 
        <button  className='button1' type="submit">Get data</button>
        </Link>
       </div>
@@ -88,4 +88,4 @@ const Form = () => {
   );
 };
 
-export default Form;
+export default StudentForm;

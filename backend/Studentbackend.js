@@ -86,7 +86,7 @@ app.put('/update-student/:studentId', async (req, res) => {
   
     try {
      
-      const deletedStudent = await Student.findOneAndDelete({ studentId: studentIdId });
+      const deletedStudent = await Student.findOneAndDelete({ studentId: studentId });
   
       if (deletedStudent) {
         res.status(200).json({ message: 'Student deleted successfully', deletedStudent });

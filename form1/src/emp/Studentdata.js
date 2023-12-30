@@ -58,7 +58,7 @@ const StudentFormdataget = () => {
       setSelectedStudent(null);
       setUpdateFormData({
         name: '',
-       studentId:'',
+        studentId:'',
         email: '',
         gender: '',
         address: '',
@@ -68,16 +68,22 @@ const StudentFormdataget = () => {
       console.error('Error updating student:', error);
     }
   };
-
   const handleDelete = async (studentId) => {
     try {
-      await axios.delete(`http://localhost:3000/delete-student/${studentId}`);
-      setStudents((prevStudents) => prevStudents.filter((student) => student.studentId !== studentId));
+      const response = await axios.delete(`http://localhost:3000/delete-student/${studentId}`);
+  
+      if (response.status === 200) {
+        console.log(`Student with ID ${studentId} deleted successfully`);
+        setStudents((prevStudents) => prevStudents.filter((student) => student.studentId !== studentId));
+      } else {
+        console.error(`Error deleting student with ID ${studentId}: Unexpected response status ${response.status}`);
+      }
     } catch (error) {
       console.error(`Error deleting student with ID ${studentId}:`, error);
     }
   };
-
+  
+  
   
   const handleInputChange = (e) => {
     setUpdateFormData({
@@ -111,8 +117,10 @@ const StudentFormdataget = () => {
               <td>{student.gender}</td>
               <td>{student.address}</td>
               <td>{student.course}</td>
-              <td><button onClick={() => handleEdit(student.studentId)}>Edit</button></td>
-              <td><button onClick={() => handleDelete(student.studentId)}>Delete</button></td>
+              <td><button className='button2' onClick={() => handleEdit(student.studentId)}>Edit</button></td>
+<td><button onClick={() => handleDelete(student.studentId)}>Delete</button>
+</td>
+
             </tr>
           ))}
         </tbody>
@@ -138,10 +146,10 @@ const StudentFormdataget = () => {
             <label>Course:</label>
             <input type='text' name='course' value={updateFormData.course} onChange={handleInputChange} />
 
-            <button type='button' onClick={handleUpdate}>
+            <button className='button4' type='button' onClick={handleUpdate}>
               Update
             </button>
-            <button type='button' onClick={() => setSelectedStudent(null)}>
+            <button className='button5' type='button' onClick={() => setSelectedStudent(null)}>
               Cancel
             </button>
           </form>

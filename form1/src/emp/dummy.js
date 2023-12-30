@@ -1,122 +1,99 @@
-// Formdataget.js
+const express = require('express');
+const mongoose = require('mongoose');
+const bodyParser = require('body-parser');
+const cors = require('cors');
 
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import './Empformget.css';
+const app = express();
+const port = 3000;
 
-const Formdataget = () => {
-  const [employees, setEmployees] = useState([]);
-  const [selectedEmployee, setSelectedEmployee] = useState(null);
-  const [updateFormData, setUpdateFormData] = useState({
-    name: '',
-    email: '',
-    gender: '',
-    address: '',
-    designation: '',
-  });
+mongoose.connect('mongodb://localhost:27017/Student', {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
 
-  useEffect(() => {
-    const fetchEmployees = async () => {
-      try {
-        const response = await axios.get('http://localhost:3001/get-employees');
-        setEmployees(response.data);
-      } catch (error) {
-        console.error('Error fetching employees:', error);
-      }
-    };
+const db = mongoose.connection;
+db.on('error', console.error.bind(console, 'MongoDB connection error:'));
+db.once('open', () => {
+  console.log('Connected to MongoDB');
+});
 
-    fetchEmployees();
-  }, []);
+const studentSchema = new mongoose.Schema({
+  name: String,
+  studentId: String,
+  email: String,
+  gender: String,
+  address: String,
+  course: String,
+});
 
-  const handleEdit = (employeeId) => {
-    const selectedEmp = employees.find((employee) => employee.employeeId === employeeId);
-    setSelectedEmployee(selectedEmp);
-    setUpdateFormData({
-      name: selectedEmp.name,
-      email: selectedEmp.email,
-      gender: selectedEmp.gender,
-      address: selectedEmp.address,
-      designation: selectedEmp.designation,
-    });
-  };
+const Student = mongoose.model('students', studentSchema);
 
-  const handleUpdate = async () => {
-    try {
-      await axios.put(`http://localhost:3000/update-employee/${selectedEmployee.employeeId}`, updateFormData);
-      // Update the local state with the new data
-      setEmployees((prevEmployees) =>
-        prevEmployees.map((employee) =>
-          employee.employeeId === selectedEmployee.employeeId ? { ...employee, ...updateFormData } : employee
-        )
-      );
-      // Reset the selected employee and form data
-      setSelectedEmployee(null);
-      setUpdateFormData({
-        name: '',
-        email: '',
-        gender: '',
-        address: '',
-        designation: '',
-      });
-    } catch (error) {
-      console.error('Error updating employee:', error);
+app.use(cors());
+app.use(bodyParser.json());
+
+app.post('/Student-form', async (req, res) => {
+  try {
+    console.log('Received form data:', req.body);
+
+    const newStudent = new Student(req.body);
+    await newStudent.save();
+    res.status(201).json({ message: 'Form submitted successfully!' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+});
+
+app.get('/get-students', async (req, res) => {
+  try {
+    const students = await Student.find();
+    console.log('Fetched students:', students);
+    res.status(200).json(students);
+  } catch (error) {
+    console.error('Error fetching students:', error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+});
+
+app.put('/update-student/:studentId', async (req, res) => {
+  const studentId = req.params.studentId;
+  const updatedStudentData = req.body;
+
+  try {
+    const updatedStudent = await Student.findOneAndUpdate(
+      { studentId: studentId },
+      { $set: updatedStudentData },
+      { new: true }
+    );
+
+    if (updatedStudent) {
+      res.status(200).json({ message: 'Student updated successfully', updatedStudent });
+    } else {
+      res.status(404).json({ message: 'Student not found' });
     }
-  };
+  } catch (error) {
+    console.error('Error updating student:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
 
-  const handleDelete = async (employeeId) => {
-    try {
-      await axios.delete(`http://localhost:3000/delete-employee/${employeeId}`);
-      setEmployees((prevEmployees) => prevEmployees.filter((employee) => employee.employeeId !== employeeId));
-    } catch (error) {
-      console.error(`Error deleting employee with ID ${employeeId}:`, error);
+app.delete('/delete-student/:studentId', async (req, res) => {
+  const studentId = req.params.studentId;
+
+  try {
+    const deletedStudent = await Student.findOneAndDelete({ studentId: studentId });
+
+    if (deletedStudent) {
+      res.status(200).json({ message: 'Student deleted successfully', deletedStudent });
+    } else {
+      res.status(404).json({ message: 'Student not found' });
     }
-  };
+  } catch (error) {
+    console.error('Error deleting student:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
 
-  const handleInputChange = (e) => {
-    setUpdateFormData({
-      ...updateFormData,
-      [e.target.name]: e.target.value,
-    });
-  };
-
-  return (
-    <div className='main'>
-      <h2>Employee List</h2>
-      <table className='employee-table'>
-        {/* ... (same as your existing code) */}
-      </table>
-
-      {/* Modal for Update */}
-      {selectedEmployee && (
-        <div className='modal'>
-          <h2>Edit Employee</h2>
-          <form>
-            <label>Name:</label>
-            <input type='text' name='name' value={updateFormData.name} onChange={handleInputChange} />
-
-            <label>Email:</label>
-            <input type='text' name='email' value={updateFormData.email} onChange={handleInputChange} />
-
-            <label>Gender:</label>
-            <input type='text' name='gender' value={updateFormData.gender} onChange={handleInputChange} />
-
-            <label>Address:</label>
-            <input type='text' name='address' value={updateFormData.address} onChange={handleInputChange} />
-
-            <label>Designation:</label>
-            <input type='text' name='designation' value={updateFormData.designation} onChange={handleInputChange} />
-
-            <button type='button' onClick={handleUpdate}>
-              Update
-            </button>
-            <button type='button' onClick={() => setSelectedEmployee(null)}>
-              Cancel
-            </button>
-          </form>
-        </div>
-      )}
-    </div>
-  );
-};
-
-export default Formdataget;
+app.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
+});

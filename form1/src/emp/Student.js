@@ -28,12 +28,12 @@ const StudentForm = () => {
     e.preventDefault();
 
     try {
-      // Use axios to make a POST request to the server
+   
       const response = await axios.post('http://localhost:3000/student-form', formData);
 
       console.log(response.data);
 
-      // Optionally, you can reset the form after successful submission
+     
       setFormData({
         name: '',
         studentId: '',
@@ -64,10 +64,12 @@ const StudentForm = () => {
         <input type="email" name="email" value={formData.email} onChange={handleChange} required />
       </div>
       <div>
-        <label>Gender:</label>
-        <input name="gender" value={formData.gender} onChange={handleChange} required/>
-      </div>
-
+      <label>Gender:</label>
+        <select name="gender" value={formData.gender} onChange={handleChange} required>
+          <option value="male">Male</option>
+          <option value="female">Female</option>
+        </select>
+     </div>
       <div>
         <label>Address:</label>
         <textarea name="address" value={formData.address} onChange={handleChange} required/>
@@ -77,7 +79,7 @@ const StudentForm = () => {
         <input type="text" name="course" value={formData.course} onChange={handleChange} required/>
       </div>
       <div>
-        <button type="submit">Submit</button>
+        <button type="submit" onClick={handleSubmit}>Submit</button>
       </div>
       <div>
        <Link to="./Studentdata" className='link'> 

@@ -63,11 +63,13 @@ const Form = () => {
         <label>Email:</label>
         <input type="email" name="email" value={formData.email} onChange={handleChange} required />
       </div>
-      <div>
-        <label>Gender:</label>
-        <input name="gender" value={formData.gender} onChange={handleChange} required/>
-      </div>
-
+    <div>
+    <label>Gender:</label>
+        <select name="gender" value={formData.gender} onChange={handleChange} required>
+          <option value="male">Male</option>
+          <option value="female">Female</option>
+        </select>
+        </div>
       <div>
         <label>Address:</label>
         <textarea name="address" value={formData.address} onChange={handleChange} required/>

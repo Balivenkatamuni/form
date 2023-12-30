@@ -28,3 +28,57 @@ table {
     margin-bottom: 10px;
   }
 
+  .button2 {
+    background-color: #4caf50;
+    color: white; 
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    text-decoration: none;
+    margin-left: -.1vw;
+  }
+  
+  .button2:hover {
+    background-color: #45a049;
+  }
+  .button3 {
+    background-color: #4caf50;
+    color: white; 
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    text-decoration: none;
+    margin-left: -.1vw;
+  }
+  
+  .button3:hover {
+    background-color: #45a049;
+  }
+  .button4{
+    background-color: #4caf50;
+    color: white; 
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+   margin-top: 1vw;
+    text-decoration: none;
+    margin-left: 10vw;
+   }
+  
+  .button4:hover {
+    background-color: #45a049;
+  }
+  .button5{
+    background-color: #4caf50;
+    color: white; 
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    text-decoration: none;
+    margin-left: 18vw;
+    margin-top: -3vw;
+  }
+  
+  .button5:hover {
+    background-color: #45a049;
+  }

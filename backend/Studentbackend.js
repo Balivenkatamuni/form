@@ -50,6 +50,7 @@ app.get('/get-students', async (req, res) => {
     const students = await Student.find();
     console.log('Fetched students:', students);
     res.status(200).json(students);
+   
   } catch (error) {
     console.error('Error fetching students:', error);
     res.status(500).json({ message: 'Internal Server Error' });
@@ -72,6 +73,7 @@ app.put('/update-student/:studentId', async (req, res) => {
   
       if (updatedStudent) {
         res.status(200).json({ message: 'Studnet updated successfully', updatedStudent });
+        
       } else {
         res.status(404).json({ message: 'Student not found' });
       }

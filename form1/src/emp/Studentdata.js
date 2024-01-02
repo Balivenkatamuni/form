@@ -1,21 +1,13 @@
-
-
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import './Studentdata.css';
 
+
 const StudentFormdataget = () => {
   const [students, setStudents] = useState([]);
   const [selectedStudent, setSelectedStudent] = useState(null);
-  const [updateFormData, setUpdateFormData] = useState({
-    name: '',
-    studentId:'',
-    email: '',
-    gender: '',
-    address: '',
-    course: '',
-  });
-  
+  const [editedData, setEditedData] = useState({});
+
   useEffect(() => {
     const fetchStudents = async () => {
       try {
@@ -23,7 +15,6 @@ const StudentFormdataget = () => {
         setStudents(response.data);
       } catch (error) {
         console.error('Error fetching students:', error);
-
       }
     };
 
@@ -33,63 +24,50 @@ const StudentFormdataget = () => {
   const handleEdit = (studentId) => {
     const selectedStudent = students.find((student) => student.studentId === studentId);
     setSelectedStudent(selectedStudent);
-    setUpdateFormData({
-      name: selectedStudent.name,
-      studentId:selectedStudent.studentId,
-      email: selectedStudent.email,
-      gender: selectedStudent.gender,
-      address: selectedStudent.address,
-      course:selectedStudent.course,
-    }); 
-  
+    setEditedData({ ...selectedStudent });
   };
 
   const handleUpdate = async () => {
     try {
-      await axios.put(`http://localhost:3000/update-student/${selectedStudent.studentId}`, updateFormData);
-     
-       setStudents((prevStudents) =>
-      prevStudents.map((student) =>
-        student.studentId === selectedStudent.studentId ? { ...student, ...updateFormData } : student
-      )
-    );
-    
-     
+      await axios.put(`http://localhost:3000/update-student/${selectedStudent.studentId}`, editedData);
+
+      setStudents((prevStudents) =>
+        prevStudents.map((student) =>
+          student.studentId === selectedStudent.studentId
+            ? { ...student, ...editedData }
+            : student
+        )
+      );
+
       setSelectedStudent(null);
-      setUpdateFormData({
-        name: '',
-        studentId:'',
-        email: '',
-        gender: '',
-        address: '',
-        course: '',
-      });
+      setEditedData({});
     } catch (error) {
       console.error('Error updating student:', error);
     }
   };
+
+  
   const handleDelete = async (studentId) => {
     try {
       const response = await axios.delete(`http://localhost:3000/delete-student/${studentId}`);
-  
+
       if (response.status === 200) {
         console.log(`Student with ID ${studentId} deleted successfully`);
-        setStudents((prevStudents) => prevStudents.filter((student) => student.studentId !== studentId));
+        setStudents((prevStudents) =>
+          prevStudents.filter((student) => student.studentId !== studentId)
+        );
       } else {
-        console.error(`Error deleting student with ID ${studentId}: Unexpected response status ${response.status}`);
+        console.error(
+          `Error deleting student with ID ${studentId}: Unexpected response status ${response.status}`
+        );
       }
     } catch (error) {
       console.error(`Error deleting student with ID ${studentId}:`, error);
     }
   };
-  
-  
-  
-  const handleInputChange = (e) => {
-    setUpdateFormData({
-      ...updateFormData,
-      [e.target.name]: e.target.value,
-    });
+
+  const handleInputChange = (field, value) => {
+    setEditedData((prevData) => ({ ...prevData, [field]: value }));
   };
 
   return (
@@ -106,56 +84,93 @@ const StudentFormdataget = () => {
             <th>Course</th>
             <th>Modification</th>
             <th>Delete</th>
+            
           </tr>
         </thead>
         <tbody>
           {students.map((student) => (
             <tr key={student._id}>
-              <td>{student.name}</td>
-              <td>{student.studentId}</td>
-              <td>{student.email}</td>
-              <td>{student.gender}</td>
-              <td>{student.address}</td>
-              <td>{student.course}</td>
-              <td><button className='button2' onClick={() => handleEdit(student.studentId)}>Edit</button></td>
-<td><button onClick={() => handleDelete(student.studentId)}>Delete</button>
-</td>
-
+              <td>
+                {selectedStudent && selectedStudent.studentId === student.studentId ? (
+                  <input   className='inputtext'
+                    value={editedData.name}
+                    onChange={(e) => handleInputChange('name', e.target.value)}
+                  />
+                ) : (
+                  student.name
+                )}
+              </td>
+              <td>
+                {selectedStudent && selectedStudent.studentId === student.studentId ? (
+                  <input className='inputtext'
+                    value={editedData.studentId}
+                    onChange={(e) => handleInputChange('studentId', e.target.value)}
+                  />
+                ) : (
+                  student.studentId
+                )}
+              </td>
+              <td>
+                {selectedStudent && selectedStudent.studentId === student.studentId ? (
+                  <input className='inputtext'
+                    value={editedData.email}
+                    onChange={(e) => handleInputChange('email', e.target.value)}
+                  />
+                ) : (
+                  student.email
+                )}
+              </td>
+              <td>
+                {selectedStudent && selectedStudent.studentId === student.studentId ? (
+                  <input  className='inputtext'
+                    value={editedData.gender}
+                    onChange={(e) => handleInputChange('gender', e.target.value)}
+                  />
+                ) : (
+                  student.gender
+                )}
+              </td>
+              <td>
+                {selectedStudent && selectedStudent.studentId === student.studentId ? (
+                  <input className='inputtext'
+                    value={editedData.address}
+                    onChange={(e) => handleInputChange('address', e.target.value)}
+                  />
+                ) : (
+                  student.address
+                )}
+              </td>
+              <td>
+                {selectedStudent && selectedStudent.studentId === student.studentId ? (
+                  <input   className='inputtext'
+                    value={editedData.course}
+                    onChange={(e) => handleInputChange('course', e.target.value)}
+                  />
+                ) : (
+                  student.course
+                )}
+              </td>
+              <td>
+                {selectedStudent && selectedStudent.studentId === student.studentId ? (
+                  <button className='button3' onClick={handleUpdate}>
+                    Done
+                  </button>
+                ) : (
+                  <button className='button2' onClick={() => handleEdit(student.studentId)}>
+                    Edit
+                  </button>
+                )}
+              </td>
+              <td>
+                <button className='button2' onClick={() => handleDelete(student.studentId)}>
+                  Delete
+                </button>
+              </td>
+           
             </tr>
           ))}
         </tbody>
       </table>
-      {selectedStudent && (
-        <div className='modal'>
-          <h2>Edit Students</h2>
-          <form >
-            <label>Name:</label>
-            <input type='text' name='name' value={updateFormData.name} onChange={handleInputChange} />
-            <label>StudentId:</label>
-            <input type='text' name='studentId' value={updateFormData.studentId} onChange={handleInputChange} />
-
-            <label>Email:</label>
-            <input type='text' name='email' value={updateFormData.email} onChange={handleInputChange} />
-
-            <label>Gender:</label>
-            <input type='text' name='gender' value={updateFormData.gender} onChange={handleInputChange} />
-
-            <label>Address:</label>
-            <input type='text' name='address' value={updateFormData.address} onChange={handleInputChange} />
-
-            <label>Course:</label>
-            <input type='text' name='course' value={updateFormData.course} onChange={handleInputChange} />
-
-            <button className='button4' type='button' onClick={handleUpdate}>
-              Update
-            </button>
-            <button className='button5' type='button' onClick={() => setSelectedStudent(null)}>
-              Cancel
-            </button>
-          </form>
-        </div>
-      )}
-
     </div>
   );
 };

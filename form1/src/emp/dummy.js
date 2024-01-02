@@ -1,99 +1,145 @@
-const express = require('express');
-const mongoose = require('mongoose');
-const bodyParser = require('body-parser');
-const cors = require('cors');
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import './Studentdata.css';
+import { Link } from 'react-router-dom';
 
-const app = express();
-const port = 3000;
+const StudentFormdataget = () => {
+  const [students, setStudents] = useState([]);
+  const [selectedStudent, setSelectedStudent] = useState(null);
 
-mongoose.connect('mongodb://localhost:27017/Student', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
+  useEffect(() => {
+    const fetchStudents = async () => {
+      try {
+        const response = await axios.get('http://localhost:3000/get-students');
+        setStudents(response.data);
+      } catch (error) {
+        console.error('Error fetching students:', error);
+      }
+    };
 
-const db = mongoose.connection;
-db.on('error', console.error.bind(console, 'MongoDB connection error:'));
-db.once('open', () => {
-  console.log('Connected to MongoDB');
-});
+    fetchStudents();
+  }, []);
 
-const studentSchema = new mongoose.Schema({
-  name: String,
-  studentId: String,
-  email: String,
-  gender: String,
-  address: String,
-  course: String,
-});
+  const handleEdit = (studentId) => {
+    const selectedStudent = students.find((student) => student.studentId === studentId);
+    setSelectedStudent(selectedStudent);
+  };
 
-const Student = mongoose.model('students', studentSchema);
+  const handleUpdate = async (field, value) => {
+    try {
+      await axios.put(`http://localhost:3000/update-student/${selectedStudent.studentId}`, {
+        [field]: value,
+      });
 
-app.use(cors());
-app.use(bodyParser.json());
+      setStudents((prevStudents) =>
+        prevStudents.map((student) =>
+          student.studentId === selectedStudent.studentId
+            ? { ...student, [field]: value }
+            : student
+        )
+      );
 
-app.post('/Student-form', async (req, res) => {
-  try {
-    console.log('Received form data:', req.body);
-
-    const newStudent = new Student(req.body);
-    await newStudent.save();
-    res.status(201).json({ message: 'Form submitted successfully!' });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Internal Server Error' });
-  }
-});
-
-app.get('/get-students', async (req, res) => {
-  try {
-    const students = await Student.find();
-    console.log('Fetched students:', students);
-    res.status(200).json(students);
-  } catch (error) {
-    console.error('Error fetching students:', error);
-    res.status(500).json({ message: 'Internal Server Error' });
-  }
-});
-
-app.put('/update-student/:studentId', async (req, res) => {
-  const studentId = req.params.studentId;
-  const updatedStudentData = req.body;
-
-  try {
-    const updatedStudent = await Student.findOneAndUpdate(
-      { studentId: studentId },
-      { $set: updatedStudentData },
-      { new: true }
-    );
-
-    if (updatedStudent) {
-      res.status(200).json({ message: 'Student updated successfully', updatedStudent });
-    } else {
-      res.status(404).json({ message: 'Student not found' });
+      setSelectedStudent(null);
+    } catch (error) {
+      console.error('Error updating student:', error);
     }
-  } catch (error) {
-    console.error('Error updating student:', error);
-    res.status(500).json({ message: 'Internal server error' });
-  }
-});
-
-app.delete('/delete-student/:studentId', async (req, res) => {
-  const studentId = req.params.studentId;
-
-  try {
-    const deletedStudent = await Student.findOneAndDelete({ studentId: studentId });
-
-    if (deletedStudent) {
-      res.status(200).json({ message: 'Student deleted successfully', deletedStudent });
-    } else {
-      res.status(404).json({ message: 'Student not found' });
+  };
+  const handleDelete = async (studentId) => {
+    try {
+      const response = await axios.delete(`http://localhost:3000/delete-student/${studentId}`);
+  
+      if (response.status === 200) {
+        console.log(`Student with ID ${studentId} deleted successfully`);
+        setStudents((prevStudents) => prevStudents.filter((student) => student.studentId !== studentId));
+      } else {
+        console.error(`Error deleting student with ID ${studentId}: Unexpected response status ${response.status}`);
+      }
+    } catch (error) {
+      console.error(`Error deleting student with ID ${studentId}:`, error);
     }
-  } catch (error) {
-    console.error('Error deleting student:', error);
-    res.status(500).json({ message: 'Internal server error' });
-  }
-});
+  };
+  
 
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
-});
+  return (
+    <div className='main'>
+      <h2>Student List</h2>
+      <table className='employee-table'>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Employee ID</th>
+            <th>Email</th>
+            <th>Gender</th>
+            <th>Address</th>
+            <th>Course</th>
+            <th>Modification</th>
+            <th>Delete</th>
+            <th>Back to Form</th>
+          </tr>
+        </thead>
+        <tbody>
+          {students.map((student) => (
+            <tr key={student._id}>
+              <td
+                contentEditable={selectedStudent && selectedStudent.studentId === student.studentId}
+                onBlur={(e) => handleUpdate('name', e.target.innerText)}
+              >
+                {student.name}
+              </td>
+              <td>{student.studentId}</td>
+              <td
+                contentEditable={selectedStudent && selectedStudent.studentId === student.studentId}
+                onBlur={(e) => handleUpdate('email', e.target.innerText)}
+              >
+                {student.email}
+              </td>
+              <td
+                contentEditable={selectedStudent && selectedStudent.studentId === student.studentId}
+                onBlur={(e) => handleUpdate('gender', e.target.innerText)}
+              >
+                {student.gender}
+              </td>
+              <td
+                contentEditable={selectedStudent && selectedStudent.studentId === student.studentId}
+                onBlur={(e) => handleUpdate('address', e.target.innerText)}
+              >
+                {student.address}
+              </td>
+              <td
+                contentEditable={selectedStudent && selectedStudent.studentId === student.studentId}
+                onBlur={(e) => handleUpdate('course', e.target.innerText)}
+              >
+                {student.course}
+              </td>
+              <td>
+                {selectedStudent && selectedStudent.studentId === student.studentId ? (
+                  <button className='button3' onClick={() => setSelectedStudent(null)}>
+                    Done
+                  </button>
+                ) : (
+                  <button className='button2' onClick={() => handleEdit(student.studentId)}>
+                    Edit
+                  </button>
+                )}
+              </td>
+              <td>
+                <button className='button2' onClick={() => handleDelete(student.studentId)}>
+                  Delete
+                </button>
+              </td>
+              <Link className='linkclass' to="/">
+                {' '}
+                <td>
+                  {' '}
+                  <button className='button6'>Form</button>
+                </td>{' '}
+              </Link>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+};
+
+export default StudentFormdataget;
